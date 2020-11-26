@@ -22,6 +22,7 @@ public class UniqueDeviceID extends CordovaPlugin {
     public static final int REQUEST_READ_PHONE_STATE = 0;
 
     protected final static String permission = Manifest.permission.READ_PHONE_STATE;
+    private static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
