@@ -53,7 +53,7 @@ public class UniqueDeviceID extends CordovaPlugin {
             String uniqueID = sharedPrefs.getString(PREF_UNIQUE_ID, null);
 
             if (uniqueID == null) {
-                uniqueID = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+                uniqueID = UUID.randomUUID().toString();
                 Editor editor = sharedPrefs.edit();
                 editor.putString(PREF_UNIQUE_ID, uniqueID);
                 editor.commit();
