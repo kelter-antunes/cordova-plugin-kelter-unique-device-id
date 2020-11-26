@@ -28,12 +28,8 @@ public class UniqueDeviceID extends CordovaPlugin {
         this.callbackContext = callbackContext;
         try {
             if (action.equals("get")) {
-                if(this.hasPermission(permission)){
-                    getDeviceId();
-                }else{
-                    this.requestPermission(this, REQUEST_READ_PHONE_STATE, permission);
-                }
-            }else {
+                getDeviceId();
+            } else {
                 this.callbackContext.error("Invalid action");
                 return false;
             }
@@ -45,42 +41,22 @@ public class UniqueDeviceID extends CordovaPlugin {
 
     }
 
-    public void onRequestPermissionResult(int requestCode, String[] permissions,
-                                          int[] grantResults) throws JSONException {
-        if(requestCode == REQUEST_READ_PHONE_STATE){
-            getDeviceId();
-        }
-    }
-
-    protected void getDeviceId(){
+    protected void getDeviceId() {
         try {
             Context context = cordova.getActivity().getApplicationContext();
-            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
-            String uuid;
-            String androidID = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
-            String deviceID = tm.getDeviceId();
-            String simID = tm.getSimSerialNumber();
+            SharedPreferences sharedPrefs = context.getSharedPreferences(PREF_UNIQUE_ID, Context.MODE_PRIVATE);
+            uniqueID = sharedPrefs.getString(PREF_UNIQUE_ID, null);
 
-            if ("9774d56d682e549c".equals(androidID) || androidID == null) {
-                androidID = "";
+            if (uniqueID == null) {
+                uniqueID = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+                Editor editor = sharedPrefs.edit();
+                editor.putString(PREF_UNIQUE_ID, uniqueID);
+                editor.commit();
             }
 
-            if (deviceID == null) {
-                deviceID = "";
-            }
-
-            if (simID == null) {
-                simID = "";
-            }
-
-            uuid = androidID + deviceID + simID;
-            uuid = String.format("%32s", uuid).replace(' ', '0');
-            uuid = uuid.substring(0, 32);
-            uuid = uuid.replaceAll("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5");
-
-            this.callbackContext.success(uuid);
-        }catch(Exception e ) {
+            this.callbackContext.success(uniqueID);
+        } catch(Exception e ) {
             this.callbackContext.error("Exception occurred: ".concat(e.getMessage()));
         }
     }
