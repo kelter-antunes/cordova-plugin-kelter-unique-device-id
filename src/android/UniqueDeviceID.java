@@ -12,6 +12,9 @@ import android.content.pm.PackageManager;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import java.util.UUID;
 
 import java.lang.reflect.Method;
 
