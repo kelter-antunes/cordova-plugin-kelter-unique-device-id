@@ -46,7 +46,7 @@ public class UniqueDeviceID extends CordovaPlugin {
             Context context = cordova.getActivity().getApplicationContext();
 
             SharedPreferences sharedPrefs = context.getSharedPreferences(PREF_UNIQUE_ID, Context.MODE_PRIVATE);
-            uniqueID = sharedPrefs.getString(PREF_UNIQUE_ID, null);
+            String uniqueID = sharedPrefs.getString(PREF_UNIQUE_ID, null);
 
             if (uniqueID == null) {
                 uniqueID = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
