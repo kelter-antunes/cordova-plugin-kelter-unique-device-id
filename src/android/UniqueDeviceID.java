@@ -12,6 +12,7 @@ import android.provider.Settings.Secure;
 import java.util.UUID;
 
 import android.media.MediaDrm;
+import java.util.*;
 
 
 public class UniqueDeviceID extends CordovaPlugin {
@@ -127,7 +128,7 @@ public class UniqueDeviceID extends CordovaPlugin {
                     identifier = identifier.toUpperCase();
                     return identifier;
                 } catch (Exception e) {
-                    Log.e("TAG", e.toString());
+     
                 }
 
     }
