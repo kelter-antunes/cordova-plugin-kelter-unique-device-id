@@ -12,7 +12,7 @@ import android.provider.Settings.Secure;
 import java.util.UUID;
 
 import android.media.MediaDrm;
-import java.util.*;
+import android.util.Base64;
 
 
 public class UniqueDeviceID extends CordovaPlugin {
