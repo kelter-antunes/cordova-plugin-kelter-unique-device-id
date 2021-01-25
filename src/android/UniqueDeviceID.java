@@ -101,7 +101,7 @@ public class UniqueDeviceID extends CordovaPlugin {
         }
     }
 
-    private string hashUUID(String uuid){
+    private String hashUUID(String uuid){
         try {
                     MessageDigest messageDigest = MessageDigest.getInstance("MD5");
                     messageDigest.update(uuid.getBytes(), 0, uuid.length());
