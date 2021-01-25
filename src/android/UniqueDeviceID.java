@@ -105,6 +105,10 @@ public class UniqueDeviceID extends CordovaPlugin {
     }
 
     private String hashUUID(String uuid){
+
+        // creating a hex string
+        String identifier = "";
+
         try {
                     MessageDigest messageDigest = MessageDigest.getInstance("MD5");
                     messageDigest.update(uuid.getBytes(), 0, uuid.length());
@@ -112,8 +116,6 @@ public class UniqueDeviceID extends CordovaPlugin {
                     // get md5 bytes
                     byte md5Bytes[] = messageDigest.digest();
 
-                    // creating a hex string
-                    String identifier = "";
 
                     for (byte md5Byte : md5Bytes) {
                         int b = (0xFF & md5Byte);
@@ -129,10 +131,12 @@ public class UniqueDeviceID extends CordovaPlugin {
 
                     // hex string to uppercase
                     identifier = identifier.toUpperCase();
-                    return identifier;
-                } catch (Exception e) {
-     
-                }
+
+            } catch (Exception e) {
+ 
+            }
+
+        return identifier;
 
     }
 }
