@@ -53,7 +53,7 @@ public class UniqueDeviceID extends CordovaPlugin {
                 try {
                   MediaDrm wvDrm = new MediaDrm(wideVineUuid);
                   byte[] wideVineId = wvDrm.getPropertyByteArray(MediaDrm.PROPERTY_DEVICE_UNIQUE_ID);
-                  uuid = android.util.Base64.encodeToString(wideVineId,android.util.Base64.DEFAULT)
+                  uuid = android.util.Base64.encodeToString(wideVineId, android.util.Base64.DEFAULT);
 
 
                 } catch (Exception e) {
