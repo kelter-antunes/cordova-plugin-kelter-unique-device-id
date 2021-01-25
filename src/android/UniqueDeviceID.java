@@ -43,10 +43,10 @@ public class UniqueDeviceID extends CordovaPlugin {
 
     protected void getDeviceId() {
        
+        String uuid = "";
+
         try {
 
-            String uuid;
-            
             /* try DrmID
             ** for more details about DRM follow the link DRM_Android (https://source.android.com/devices/drm).
             */
