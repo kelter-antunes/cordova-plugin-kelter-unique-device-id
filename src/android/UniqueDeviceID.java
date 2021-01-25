@@ -67,8 +67,6 @@ public class UniqueDeviceID extends CordovaPlugin {
 
     }
 
-    @SuppressWarnings("deprecation")
-    @SuppressLint("HardwareIds")
     public static String generateDeviceIdentifier(Context context) {
 
             String pseudoId = "35" +
