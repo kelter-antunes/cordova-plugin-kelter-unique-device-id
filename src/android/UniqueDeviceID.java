@@ -53,7 +53,7 @@ public class UniqueDeviceID extends CordovaPlugin {
                 try {
                   MediaDrm wvDrm = new MediaDrm(wideVineUuid);
                   byte[] wideVineId = wvDrm.getPropertyByteArray(MediaDrm.PROPERTY_DEVICE_UNIQUE_ID);
-                  uuid = Base64.encodeToString(WideVineId , Base64.Default) 
+                  uuid = Base64.encodeToString(WideVineId , Base64.Default);
 
                 } catch (Exception e) {
                   // Inspect exception
@@ -69,7 +69,7 @@ public class UniqueDeviceID extends CordovaPlugin {
                 */
                 Context context = cordova.getActivity().getApplicationContext();
                 uuid = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID); 
-                if (uuid == null || uuid.equals("9774d56d682e549c") || uuid.length() < 15 ) {
+                if ( uuid == null || uuid.equals("9774d56d682e549c") || uuid.length() < 15 ) {
                     /* if ANDROID_ID is null, 
                     ** or it's equals to the GalaxyTab generic ANDROID_ID 
                     ** or bad, 
