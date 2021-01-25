@@ -7,8 +7,12 @@ import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import android.os.Build;
 import android.provider.Settings.Secure;
 import java.util.UUID;
+
+import android.media.MediaDrm;
+
 
 public class UniqueDeviceID extends CordovaPlugin {
 
@@ -35,101 +39,96 @@ public class UniqueDeviceID extends CordovaPlugin {
     }
 
     protected void getDeviceId() {
+       
         try {
-            Context context = cordova.getActivity().getApplicationContext();
-            SharedPreferences sharedPrefs = context.getSharedPreferences(PREF_UNIQUE_ID, Context.MODE_PRIVATE);
-            String uuid = sharedPrefs.getString(PREF_UNIQUE_ID, null);
 
-            if (uuid == null) {
-                uuid = generateDeviceIdentifier(context);
-                SharedPreferences.Editor editor = sharedPrefs.edit();
-                editor.putString(PREF_UNIQUE_ID, uuid);
-                editor.commit();
+            String uuid;
+            
+            /* try DrmID
+            ** for more details about DRM follow the link DRM_Android (https://source.android.com/devices/drm).
+            */
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                UUID wideVineUuid = new UUID(-0x121074568629b532L, -0x5c37d8232ae2de13L);
+                try {
+                  MediaDrm wvDrm = new MediaDrm(wideVineUuid);
+                  byte[] wideVineId = wvDrm.getPropertyByteArray(MediaDrm.PROPERTY_DEVICE_UNIQUE_ID);
+                  uuid = Base64.encodeToString(WideVineId , Base64.Default) 
+
+                } catch (Exception e) {
+                  // Inspect exception
+                  uuid = "";
+                }
+
             }
 
+            /*Still no uuid?*/
+            if( uuid == "" ) {
+                /*Try to get the ANDROID_ID
+                ** It will give same android Id until Device get reset.
+                */
+                Context context = cordova.getActivity().getApplicationContext();
+                uuid = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID); 
+                if (uuid == null || uuid.equals("9774d56d682e549c") || uuid.length() < 15 ) {
+                    /* if ANDROID_ID is null, 
+                    ** or it's equals to the GalaxyTab generic ANDROID_ID 
+                    ** or bad, 
+                    ** generates a new one
+                    ** 
+                    ** Random UUID
+                    ** It will generate different id every time for that you have to store in 
+                    ** preference or database for use as unique id in the app.
+                    */
+                    SharedPreferences sharedPrefs = context.getSharedPreferences(PREF_UNIQUE_ID, Context.MODE_PRIVATE);
+                    uuid = sharedPrefs.getString(PREF_UNIQUE_ID, null);
+
+                    if (uuid == null) {
+                        uuid = UUID.randomUUID().toString();
+                        SharedPreferences.Editor editor = sharedPrefs.edit();
+                        editor.putString(PREF_UNIQUE_ID, uuid);
+                        editor.commit();
+                    }
+
+                }
+            }
+
+            uuid = hashUUID(uuid);
+
             this.callbackContext.success(uuid);
+
         } catch (Exception e) {
             this.callbackContext.error("Exception occurred: ".concat(e.getMessage()));
         }
     }
 
-    /*
-     * Generate a new UDID
-     */
-    private String generateUDID(Context context) {
-        
-        //Try to get the ANDROID_ID
-        String UDID = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID); 
-        if (UDID == null || UDID.equals("9774d56d682e549c") || UDID.length() < 15 ) {
-            //if ANDROID_ID is null, or it's equals to the GalaxyTab generic ANDROID_ID or bad, generates a new one
-            UDID = UUID.randomUUID().toString();
-        }
+    private string hashUUID(String uuid){
+        try {
+                    MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+                    messageDigest.update(uuid.getBytes(), 0, uuid.length());
 
+                    // get md5 bytes
+                    byte md5Bytes[] = messageDigest.digest();
 
-    }
+                    // creating a hex string
+                    String identifier = "";
 
-    public static String generateDeviceIdentifier(Context context) {
+                    for (byte md5Byte : md5Bytes) {
+                        int b = (0xFF & md5Byte);
 
-            String pseudoId = "35" +
-                    Build.BOARD.length() % 10 +
-                    Build.BRAND.length() % 10 +
-                    Build.CPU_ABI.length() % 10 +
-                    Build.DEVICE.length() % 10 +
-                    Build.DISPLAY.length() % 10 +
-                    Build.HOST.length() % 10 +
-                    Build.ID.length() % 10 +
-                    Build.MANUFACTURER.length() % 10 +
-                    Build.MODEL.length() % 10 +
-                    Build.PRODUCT.length() % 10 +
-                    Build.TAGS.length() % 10 +
-                    Build.TYPE.length() % 10 +
-                    Build.USER.length() % 10;
+                        // if it is a single digit, make sure it have 0 in front (proper padding)
+                        if (b <= 0xF) {
+                            identifier += "0";
+                        }
 
-            //Try to get the ANDROID_ID
-            String androidId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID); 
-            if (androidId == null || androidId.equals("9774d56d682e549c") || androidId.length() < 15 ) {
-                //if ANDROID_ID is null, or it's equals to the GalaxyTab generic ANDROID_ID or bad, generates a new one
-                androidId = UUID.randomUUID().toString();
-            }
-
-            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            String btId = "";
-
-            if (bluetoothAdapter != null) {
-                btId = bluetoothAdapter.getAddress();
-            }
-
-            String longId = pseudoId + androidId + btId;
-
-            try {
-                MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-                messageDigest.update(longId.getBytes(), 0, longId.length());
-
-                // get md5 bytes
-                byte md5Bytes[] = messageDigest.digest();
-
-                // creating a hex string
-                String identifier = "";
-
-                for (byte md5Byte : md5Bytes) {
-                    int b = (0xFF & md5Byte);
-
-                    // if it is a single digit, make sure it have 0 in front (proper padding)
-                    if (b <= 0xF) {
-                        identifier += "0";
+                        // add number to string
+                        identifier += Integer.toHexString(b);
                     }
 
-                    // add number to string
-                    identifier += Integer.toHexString(b);
+                    // hex string to uppercase
+                    identifier = identifier.toUpperCase();
+                    return identifier;
+                } catch (Exception e) {
+                    Log.e("TAG", e.toString());
                 }
 
-                // hex string to uppercase
-                identifier = identifier.toUpperCase();
-                return identifier;
-            } catch (Exception e) {
-                Log.e("TAG", e.toString());
-            }
-            return "";
     }
-
 }
