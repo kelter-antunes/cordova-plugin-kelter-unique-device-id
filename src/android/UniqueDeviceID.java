@@ -7,6 +7,7 @@ import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import android.provider.Settings.Secure;
 import java.util.UUID;
 
 public class UniqueDeviceID extends CordovaPlugin {
